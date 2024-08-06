@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.net.InetAddress;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -17,6 +19,9 @@ public class ApplicationRunner implements CommandLineRunner {
 
     @Autowired
     private TranslationService translationService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -41,8 +46,13 @@ public class ApplicationRunner implements CommandLineRunner {
         List<String> translatedWords = futures.stream()
                 .map(CompletableFuture::join)
                 .collect(Collectors.toList());
+        String outputText = String.join(" ", translatedWords);
+        System.out.println(outputText);
+        LocalDateTime timeStamp = LocalDateTime.now();
+        String ipAddress = InetAddress.getLocalHost().getHostAddress();
 
-        System.out.println(String.join(" ", translatedWords));
+        UserInfo user = new UserInfo(ipAddress, text, outputText, timeStamp);
+        userRepository.save(user);
 
         executorService.shutdown();
     }

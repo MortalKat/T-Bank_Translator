@@ -17,6 +17,9 @@ public class TranslationService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public String translate(String langFrom, String langTo, String text) throws UnsupportedEncodingException {
         String url = "https://script.google.com/macros/s/AKfycbz9q60cKZf9t9ReN4OgNllt59NPQ5EnPS7epN0GV45q9MM54OTavcMpqsslvhvCsiiQ/exec";
 
@@ -40,5 +43,7 @@ public class TranslationService {
             }
         });
     }
-
+    public void saveUserRequest(UserInfo userInfo) {
+        userRepository.save(userInfo);
+    }
 }
