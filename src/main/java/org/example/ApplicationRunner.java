@@ -5,6 +5,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -20,8 +24,8 @@ public class ApplicationRunner implements CommandLineRunner {
     @Autowired
     private TranslationService translationService;
 
-    @Autowired
-    private UserRepository userRepository;
+    Connection con;
+    Statement stmt;
 
     @Override
     public void run(String... args) throws Exception {
@@ -52,8 +56,24 @@ public class ApplicationRunner implements CommandLineRunner {
         String ipAddress = InetAddress.getLocalHost().getHostAddress();
 
         UserInfo user = new UserInfo(ipAddress, text, outputText, timeStamp);
-        userRepository.save(user);
+
+        saveInSqlite(user);
 
         executorService.shutdown();
+    }
+
+    public void saveInSqlite(UserInfo user) throws ClassNotFoundException, SQLException {
+        Class.forName("org.sqlite.JDBC");
+        con = DriverManager.getConnection("jdbc:sqlite:translation.db");
+        stmt = con.createStatement();
+        String sql = "INSERT INTO requests (ip, input, output)" +
+                "VALUES ('"+user.getIpAddress()+"', '"+
+                user.getInputLine()+"', '"+
+                user.getOutputLine()+"')";
+        System.out.println(sql);
+        stmt.executeUpdate(sql);
+        stmt.close();
+        con.close();
+
     }
 }

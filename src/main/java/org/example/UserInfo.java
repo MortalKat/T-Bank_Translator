@@ -1,13 +1,9 @@
 package org.example;
 
-import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
-@Entity
 public class UserInfo {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private long id;
     private String ipAddress;
     private String inputLine;
